@@ -1,10 +1,11 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 const express = require('express');
+const config = require('./config');
 
 async function getPriceFeed(){
     try{
-        const siteUrl = 'https://coinmarketcap.com/';
+        const siteUrl = config.web.siteUrl;
 
         const {data} = await axios({
             method: "GET",
@@ -12,17 +13,7 @@ async function getPriceFeed(){
         });
         const $ = cheerio.load(data);
         const elemSelector = '#__next > div > div.main-content > div.cmc-body-wrapper > div > div:nth-child(1) > div.sc-beb003d5-2.bkNrIb > table > tbody > tr';
-        const indexName = [
-            'rank',
-            'name',
-            'price',
-            '1h',
-            '24h',
-            '7D',
-            'marketCap',
-            'volume',
-            'circulatingSupply'
-        ];
+        const indexName = config.web.indexName;
         const coinAr = [];
         $(elemSelector).each((parentIdx, parentElem) =>{
             //console.log(parentElem);
@@ -67,6 +58,6 @@ app.get('/api/price-feed', async(req, res) => {
     }
 })
 
-app.listen(3000, ()=>{
-    console.log('Crypto price feed running on port 3000');
+app.listen(config.web.port, ()=>{
+    console.log('Crypto price feed running on port '+config.web.port);
 })
